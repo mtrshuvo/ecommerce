@@ -2,6 +2,8 @@ require("dotenv").config();
 const app = require('./app')
 const mongoose = require('mongoose');
 
+global.__basedir = __dirname
+
 mongoose.connect("mongodb+srv://mtrshuvo:oTKe6q9wK0qM5AdC@cluster0.ssew7.mongodb.net/ecommerce?retryWrites=true&w=majority",{
     useNewUrlParser:true,
     useCreateIndex:true,

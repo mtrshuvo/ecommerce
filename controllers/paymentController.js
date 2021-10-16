@@ -3,6 +3,9 @@ const { Profile } = require('../models/profile');
 const PaymentSession = require('ssl-commerz-node').PaymentSession;
 const {Order} = require('../models/order');
 const {Payment} = require('../models/payment');
+const path = require("path");
+
+
 module.exports.ipn = async(req, res)=>{
     const payment = new Payment(req.body);
     const tran_id = payment["tran_id"];
@@ -19,6 +22,18 @@ module.exports.ipn = async(req, res)=>{
     }
     await payment.save();
     return res.status(200).send("IPN")
+}
+
+module.exports.successPayment = async(req, res)=>{
+    res.sendFile(path.join(__basedir+"public/success.html"));
+}
+module.exports.failedPayment = async(req, res)=>{
+    res.sendFile(path.join(__basedir+"public/success.html"));
+
+}
+module.exports.cancelPayment = async(req, res)=>{
+    res.sendFile(path.join(__basedir+"public/success.html"));
+
 }
 module.exports.initPayment = async (req, res) => {
     const userId = req.user._id;
@@ -39,9 +54,9 @@ module.exports.initPayment = async (req, res) => {
 
     // Set the urls
     payment.setUrls({
-        success: 'yoursite.com/success', // If payment Succeed
-        fail: 'yoursite.com/fail', // If payment failed
-        cancel: 'yoursite.com/cancel', // If user cancel payment
+        success: 'https://mtrs-ecommerce.herokuapp.com/api/payment/success', // If payment Succeed
+        fail: 'https://mtrs-ecommerce.herokuapp.com/api/payment/failed', // If payment failed
+        cancel: 'https://mtrs-ecommerce.herokuapp.com/api/payment/cancel', // If user cancel payment
         ipn: 'https://mtrs-ecommerce.herokuapp.com/api/payment/ipn' // SSLCommerz will send http post request in this link
     });
 
