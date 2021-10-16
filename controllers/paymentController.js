@@ -95,7 +95,7 @@ module.exports.initPayment = async (req, res) => {
         user: userId
     });
 
-    if (response.success === "SUCCESS"){
+    if (response.status === "SUCCESS"){
         order.sessionKey = response["sessionkey"];
         await order.save();
     }
