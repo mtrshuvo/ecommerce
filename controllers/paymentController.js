@@ -2,6 +2,9 @@ const { CartItem } = require('../models/cartItem');
 const { Profile } = require('../models/profile');
 const PaymentSession = require('ssl-commerz-node').PaymentSession;
 
+module.exports.ipn = async(req, res)=>{
+    console.log(req.body);
+}
 module.exports.initPayment = async (req, res) => {
     const userId = req.user._id;
     const cartItems = await CartItem.find({ user: userId });
@@ -24,7 +27,7 @@ module.exports.initPayment = async (req, res) => {
         success: 'yoursite.com/success', // If payment Succeed
         fail: 'yoursite.com/fail', // If payment failed
         cancel: 'yoursite.com/cancel', // If user cancel payment
-        ipn: 'yoursite.com/ipn' // SSLCommerz will send http post request in this link
+        ipn: 'https://mtrs-ecommerce.herokuapp.com/api/ipn' // SSLCommerz will send http post request in this link
     });
 
     // Set order details
