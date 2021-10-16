@@ -1,9 +1,24 @@
 const { CartItem } = require('../models/cartItem');
 const { Profile } = require('../models/profile');
 const PaymentSession = require('ssl-commerz-node').PaymentSession;
-
+const {Order} = require('../models/order');
+const {Payment} = require('../models/payment');
 module.exports.ipn = async(req, res)=>{
-    console.log(req.body);
+    const payment = new Payment(req.body);
+    const tran_id = payment["tran_id"];
+    if (payment["status"] === "VALID"){
+        const order = await Order.updateOne({
+            transaction_id: tran_id
+        }, {
+            status :"complete"
+        });
+        await CartItem.deleteMany(order.cartItems);
+    }
+    else{
+        await Order.deleteOne({transaction_id: tran_id});
+    }
+    await payment.save();
+    return res.status(200).send("IPN")
 }
 module.exports.initPayment = async (req, res) => {
     const userId = req.user._id;
@@ -27,7 +42,7 @@ module.exports.initPayment = async (req, res) => {
         success: 'yoursite.com/success', // If payment Succeed
         fail: 'yoursite.com/fail', // If payment failed
         cancel: 'yoursite.com/cancel', // If user cancel payment
-        ipn: 'https://mtrs-ecommerce.herokuapp.com/api/ipn' // SSLCommerz will send http post request in this link
+        ipn: 'https://mtrs-ecommerce.herokuapp.com/api/payment/ipn' // SSLCommerz will send http post request in this link
     });
 
     // Set order details
@@ -72,6 +87,18 @@ module.exports.initPayment = async (req, res) => {
         product_profile: 'general'
     });
 
-   let response = await payment.paymentInit();
+    let response = await payment.paymentInit();
+    let order = new Order({
+        cartItem: cartItems,
+        transaction_id: tran_id,
+        address: profile,
+        user: userId
+    });
+
+    if (response.success === "SUCCESS"){
+        order.sessionKey = response["sessionkey"];
+        await order.save();
+    }
+
     return res.status(200).send(response);
 }
