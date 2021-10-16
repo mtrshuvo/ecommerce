@@ -25,14 +25,14 @@ module.exports.ipn = async(req, res)=>{
 }
 
 module.exports.successPayment = async(req, res)=>{
-    res.sendFile(path.join(__basedir+"public/success.html"));
+    res.sendFile(path.join(__basedir+"/public/success.html"));
 }
 module.exports.failedPayment = async(req, res)=>{
-    res.sendFile(path.join(__basedir+"public/falied.html"));
+    res.sendFile(path.join(__basedir+"/public/falied.html"));
 
 }
 module.exports.cancelPayment = async(req, res)=>{
-    res.sendFile(path.join(__basedir+"public/cancel.html"));
+    res.sendFile(path.join(__basedir+"/public/cancel.html"));
 
 }
 module.exports.initPayment = async (req, res) => {
